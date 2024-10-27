@@ -1,20 +1,4 @@
-from sprites import Sprite, Colour
-
-class Pixel:
-    def __init__(self, value, parent: Sprite = None, colour: Colour = None):
-        self.value = value
-        if colour is None:
-            self.colour = Colour(id="WHITE")
-        else:
-            self.colour = colour
-
-        if parent is not None:
-            self.parent = parent
-            self.colour = parent.colour
-
-    def display(self):
-        self.colour.set()
-        print(self.value, end="")
+from .sprites import Colour, Sprite, Pixel
 
 class Display:
     def __init__(self, w=100, h=25):
@@ -22,6 +6,25 @@ class Display:
         self.h = h
         # index into using Display.display[x][y]
         self.display = [[Pixel(' ') for _ in range(h)] for _ in range(w)]
+
+    def plot(self, sprite: Sprite):
+        for row in self.display:
+            for tile in row:
+                if tile.parent is sprite:
+                    print("FOUND")
+                    tile.empty()
+
+        pos = sprite.pos
+
+        for i, row in enumerate(sprite.map):
+            for j, tile in enumerate(row):
+                if 0 < pos[0]+j < self.w and 0 < pos[1]+i < self.h:
+                    self.display[pos[0]+j][pos[1]+i] = tile.paste()
+
+    def reset(self):
+        for row in self.display:
+            for pixel in row:
+                pixel.empty()
     
     def update(self):
         print("\033c", end="")
@@ -36,7 +39,6 @@ class Display:
             Colour.reset()
             print('\u2503')
         print('\u2517' + ('\u2501' * self.w) + '\u251B')
+        self.reset()
 
-d = Display()
-d.display[5][5] = Pixel('#', colour=Colour(id="RED"))
-d.update()
+

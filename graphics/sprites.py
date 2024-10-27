@@ -109,8 +109,61 @@ class Colour:
     def __repr__(self):
         return str(self.value)
 
+
+class Movements:
+    left = (-1, 0)
+    right = (1, 0)
+    up = (0, -1)
+    down = (0, 1)
+
+class Pixel:
+    def __init__(self, value, parent: 'Sprite' = None, colour: Colour = Colour(id="WHITE")):
+        self.value = value
+        self.parent = None
+        if colour is None:
+            self.colour = Colour(id="WHITE")
+        else:
+            self.colour = colour
+
+        if parent is not None:
+            self.parent = parent
+
+    def display(self):
+        self.colour.set()
+        print(self.value, end="")
+
+    def empty(self):
+        self.colour = Colour(id="WHITE")
+        self.parent = None
+        self.value = ' '
+
+    def paste(self):
+        return Pixel(self.value, self.parent, self.colour)
+
 class Sprite:
-    def __init__(self, colour: Colour):
-        self.colour = colour
+    def __init__(self, map: list[list[Pixel | None]] | list[list], pos: tuple[int], colour: Colour = Colour(id="WHITE"),):
+        if isinstance(map[0][0], Pixel):
+            for row in map:
+                for pixel in row:
+                    pixel.parent = self
+            self.map = map
+        else:
+            self.map = [[Pixel(pixel, self, colour) for pixel in row] for row in map]
+        self.pos = pos
 
+    def moveBy(self, move: tuple[int]):
+        self.pos = (self.pos[0] + move[0], self.pos[1] + move[1])
 
+    def moveTo(self, coords: tuple[int]):
+        self.pos = coords
+
+    def reColour(self, colour: Colour, replace: Colour = None):
+        if replace is None:
+            for row in self.map:
+                for pixel in row:
+                    pixel.colour = colour
+        else:
+            for row in self.map:
+                for pixel in row:
+                    if pixel.colour.value == replace.value:
+                        pixel.colour = colour

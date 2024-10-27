@@ -1,0 +1,3 @@
+# I HATE INPUT :)
+
+# Ill do all this later...
